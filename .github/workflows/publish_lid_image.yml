@@ -1,0 +1,57 @@
+# Imagen de este fork (LID → número). Solo corre en las ramas lid-* o a mano; no publica en Docker Hub.
+name: Publish LID fork image
+
+on:
+  push:
+    branches:
+      - 'lid-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  TAG: 2.4.0-rc2-lid
+
+jobs:
+  build-and-push:
+    if: github.repository != 'evolution-foundation/evolution-api'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image name
+        id: vars
+        run: echo "image=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/evolution-api-lid" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Unofficial fork of Evolution API 2.4.0-rc2 (Evolution Foundation) with LID to phone number resolution
+            org.opencontainers.image.licenses=Apache-2.0
+          tags: |
+            ${{ steps.vars.outputs.image }}:${{ env.TAG }}
+            ${{ steps.vars.outputs.image }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

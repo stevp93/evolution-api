@@ -1,3 +1,12 @@
+> [!NOTE]
+> **Fork no oficial · Unofficial fork** — basado en [Evolution API 2.4.0-rc2](https://github.com/evolution-foundation/evolution-api/releases/tag/2.4.0-rc2) de [Evolution Foundation](https://evolutionfoundation.com.br). No está afiliado ni respaldado por Evolution Foundation. Todo el crédito del proyecto es de sus autores; este fork solo agrega lo descrito abajo. / Based on Evolution API 2.4.0-rc2 by Evolution Foundation; not affiliated with or endorsed by them.
+>
+> **Qué cambia (rama `lid-2.4.0-rc2`):** cuando un mensaje llega por LID sin `remoteJidAlt`, se busca el número en el almacén de pares LID→número de Baileys (`signalRepository.lidMapping`) y se entrega en el webhook igual que cuando WhatsApp lo envía (`remoteJidAlt`/`remoteJid`, `addressingMode: "pn"`, `pnSource: "lid-mapping"`). Nuevo endpoint `POST /chat/findPnByLid/{instance}` con `{"number": "<lid>"}` → `{"lid", "pn" | null, "source"}`.
+>
+> **Límite:** WhatsApp no deja consultar el número detrás de un LID. Solo se obtiene si WhatsApp ya compartió el par con este dispositivo; si la persona oculta su número tras un nombre de usuario, `pn` es `null`.
+>
+> **Imagen:** `ghcr.io/stevp93/evolution-api-lid:2.4.0-rc2-lid` (linux/amd64 y linux/arm64). Como la versión original 2.4.0, requiere activar la licencia de Evolution Foundation (ver CHANGELOG). Licencia: la misma del proyecto original ([LICENSE](./LICENSE), [NOTICE](./NOTICE), [TRADEMARKS.md](./TRADEMARKS.md)).
+
 <p align="center">
   <a href="https://evolutionfoundation.com.br">
     <img src="./public/hover-evolution.png" alt="Evolution Foundation" />

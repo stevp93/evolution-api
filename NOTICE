@@ -17,3 +17,19 @@ This product includes software derived from CodeChat WhatsApp API
 The CodeChat project implemented the Baileys library
 (https://github.com/WhiskeySockets/Baileys), which Evolution API also uses for
 its WhatsApp Web integration.
+
+Modifications in this fork
+
+This repository (https://github.com/stevp93/evolution-api, branch lid-2.4.0-rc2)
+is an unofficial fork of Evolution API 2.4.0-rc2
+(https://github.com/evolution-foundation/evolution-api/releases/tag/2.4.0-rc2).
+It is not affiliated with, sponsored or endorsed by Evolution Foundation.
+
+Changes by Steven Paredes (2026), on top of tag 2.4.0-rc2:
+- src/api/integrations/channel/whatsapp/whatsapp.baileys.service.ts:
+  findPnByLid() and filling remoteJidAlt from Baileys lid-mapping in messages.upsert.
+- src/api/controllers/chat.controller.ts, src/api/routes/chat.router.ts,
+  src/validate/chat.schema.ts: POST /chat/findPnByLid/{instance}.
+- .github/workflows/publish_lid_image.yml: builds this fork's Docker image.
+- README.md: fork notice.
+The manager UI and all Evolution API brand assets are unmodified.
