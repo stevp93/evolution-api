@@ -52,6 +52,10 @@ export class ChatController {
     return await this.waMonitor.waInstances[instanceName].profilePicture(data.number);
   }
 
+  public async findPnByLid({ instanceName }: InstanceDto, data: NumberDto) {
+    return await this.waMonitor.waInstances[instanceName].findPnByLid(data.number);
+  }
+
   public async fetchProfile({ instanceName }: InstanceDto, data: NumberDto) {
     return await this.waMonitor.waInstances[instanceName].fetchProfile(instanceName, data.number);
   }

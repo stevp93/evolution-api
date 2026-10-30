@@ -328,6 +328,16 @@ export const profileStatusSchema: JSONSchema7 = {
   ...isNotEmpty('status'),
 };
 
+export const lidSchema: JSONSchema7 = {
+  $id: v4(),
+  type: 'object',
+  properties: {
+    number: { type: 'string', description: 'LID, with or without @lid' },
+  },
+  required: ['number'],
+  ...isNotEmpty('number'),
+};
+
 export const profileSchema: JSONSchema7 = {
   type: 'object',
   properties: {

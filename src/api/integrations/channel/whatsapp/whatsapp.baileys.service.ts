@@ -1646,6 +1646,15 @@ export class BaileysStartupService extends ChannelStartupService {
           this.logger.verbose(messageRaw);
 
           sendTelemetry(`received.message.${messageRaw.messageType ?? 'unknown'}`);
+          // LID without remoteJidAlt: fill it from the LID-to-number pairs WhatsApp already shared with
+          // this device, so webhook consumers get the number whenever it is known.
+          if (messageRaw.key.remoteJid?.endsWith('@lid') && !messageRaw.key.remoteJidAlt) {
+            const { pn } = await this.findPnByLid(messageRaw.key.remoteJid).catch(() => ({ pn: null }));
+            if (pn) {
+              messageRaw.key.remoteJidAlt = pn;
+              (messageRaw.key as any).pnSource = 'lid-mapping';
+            }
+          }
 
           if (messageRaw.key.remoteJid?.includes('@lid') && messageRaw.key.remoteJidAlt) {
             const lid = messageRaw.key.remoteJid;
@@ -2278,6 +2287,32 @@ export class BaileysStartupService extends ChannelStartupService {
     } catch {
       return { wuid: jid, status: null };
     }
+  }
+
+  /**
+   * Phone number behind a LID, only if WhatsApp already shared it with this device
+   * (message envelopes with an alternate address, LID migration sync, usync results).
+   * WhatsApp does not let a client look up the number of a LID, so null is a normal answer.
+   */
+  public async findPnByLid(lid: string): Promise<{ lid: string; pn: string | null; source: string | null }> {
+    const user = String(lid || '')
+      .split('@')[0]
+      .split(':')[0];
+    if (!/^\d+$/.test(user)) {
+      throw new BadRequestException('Invalid LID');
+    }
+    const lidJid = `${user}@lid`;
+
+    try {
+      const mapped = await this.client?.signalRepository?.lidMapping?.getPNForLID(lidJid);
+      if (mapped) {
+        return { lid: lidJid, pn: jidNormalizedUser(mapped), source: 'lid-mapping' };
+      }
+    } catch (error) {
+      this.logger.warn(`findPnByLid: lid-mapping lookup failed for ${lidJid}: ${error?.message}`);
+    }
+
+    return { lid: lidJid, pn: null, source: null };
   }
 
   public async fetchProfile(instanceName: string, number?: string) {

@@ -27,6 +27,7 @@ import {
   contactValidateSchema,
   decryptPollVoteSchema,
   deleteMessageSchema,
+  lidSchema,
   markChatUnreadSchema,
   markMessageAsPlayedSchema,
   messageUpSchema,
@@ -222,6 +223,16 @@ export class ChatRouter extends RouterBroker {
           schema: profilePictureSchema,
           ClassRef: ProfilePictureDto,
           execute: (instance, data) => chatController.fetchBusinessProfile(instance, data),
+        });
+
+        return res.status(HttpStatus.OK).json(response);
+      })
+      .post(this.routerPath('findPnByLid'), ...guards, async (req, res) => {
+        const response = await this.dataValidate<NumberDto>({
+          request: req,
+          schema: lidSchema,
+          ClassRef: NumberDto,
+          execute: (instance, data) => chatController.findPnByLid(instance, data),
         });
 
         return res.status(HttpStatus.OK).json(response);
